@@ -254,20 +254,15 @@ static int npc_cloaked_sub(struct block_list *bl, va_list ap)
 /*==========================================
  * Disable / Enable NPC
  *------------------------------------------*/
-bool npc_enable_target(const char* name, uint32 char_id, int flag)
+bool npc_enable_target(npc_data* nd, uint32 char_id, int flag)
 {
-	struct npc_data* nd = npc_name2id(name);
-
-	if (!nd) {
-		ShowError("npc_enable: Attempted to %s a non-existing NPC '%s' (flag=%d).\n", (flag&11) ? "show" : "hide", name, flag);
-		return false;
-	}
+	nullpo_ret(nd);
 
 	if (char_id > 0 && (flag & 24)) {
 		map_session_data *sd = map_charid2sd(char_id);
 	
 		if (!sd) {
-			ShowError("npc_enable: Attempted to %s a NPC '%s' on an invalid target %d.\n", (flag & 8) ? "show" : "hide", name, char_id);
+			ShowError("npc_enable: Attempted to %s a NPC '%s' on an invalid target %d.\n", (flag & 8) ? "show" : "hide", nd->name, char_id);
 			return false;
 		}
 
@@ -2674,7 +2669,7 @@ static void npc_parsename(struct npc_data* nd, const char* name, const char* sta
  */
 int npc_parseview(const char* w4, const char* start, const char* buffer, const char* filepath) {
 	int i = 0;
-	char viewid[1024];	// Max size of name from const.txt, see read_constdb.
+	char viewid[1024];	// Max size of name from const.yml, see ConstantDatabase::parseBodyNode.
 
 	// Extract view ID / constant
 	while (w4[i] != '\0') {
